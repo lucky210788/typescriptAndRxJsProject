@@ -47,27 +47,15 @@ const steamUser$ = fromEvent(btnGetUsers, 'click')
     }),
     switchMap((value: object) =>
       Observable.create((observer: any) => {
-        // axios.get(`${baseUrl}users`)
-        //   .then((response: Response<User>) => {
-        //     if (response.status == 200) {
-        //       showToast('successful response');
-        //       response.data.forEach((user: User) => {
-        //         observer.next(user);
-        //       });
-        //     } else showToast('not successful response');
-        //   }).catch((error: string) => {
-        //   console.error(error);
-        // });
         get('users')
           .then(response => {
             const arr: any = response;
-                for(let user of arr){
-                  observer.next(user);
-                }
-          } )
+            for (let user of arr) {
+              observer.next(user);
+            }
+          })
       })
     )
-
   );
 
 steamUser$.subscribe(
@@ -87,24 +75,13 @@ steamUser$.subscribe(
         }),
         switchMap((value: Object) =>
           Observable.create((observer: any) => {
-            // axios.get(`${baseUrl}posts?userId=${user.id}`)
-            //   .then((response: Response<Post>) => {
-            //     if (response.status == 200) {
-            //       showToast('successful response');
-            //       response.data.forEach((post: Post) => {
-            //         observer.next(post);
-            //       });
-            //     } else showToast('not successful response');
-            //   }).catch((error: string) => {
-            //   console.error(error);
-            // })
             get(`posts?userId=${user.id}`)
               .then(response => {
                 const arr: any = response;
-                for(let post of arr){
+                for (let post of arr) {
                   observer.next(post);
                 }
-              } )
+              })
           })
         )
       );
@@ -119,35 +96,25 @@ steamUser$.subscribe(
                                 </div>`;
         getCountComments(post.id);
         const steamComment$ = fromEvent(postItem, 'click');
-        steamComment$.subscribe(() => {
-          // axios.get(`${baseUrl}comments?postId=${post.id}`)
-          //   .then((response: Response<Comment>) => {
-          //     if (response.status == 200) {
-          //       showToast('successful response');
-          //       commentList.innerHTML = '';
-          //       commentList.classList.remove('d-none');
-          //       response.data.forEach((comment: Comment) => {
-          //         const commentItem = commentList.appendChild(document.createElement('li'));
-          //         commentItem.className = 'list-item';
-          //         commentItem.innerHTML = comment.name;
-          //       });
-          //     } else showToast('not successful response');
-          //   }).catch((error: string) => {
-          //   console.error(error);
-          // })
-          get(`comments?postId=${post.id}`)
-            .then(response => {
-              const arr: any = response;
-              commentList.innerHTML = '';
-              commentList.classList.remove('d-none');
-              for(let comment of arr){
-                const commentItem = commentList.appendChild(document.createElement('li'));
-                commentItem.className = 'list-item';
-                commentItem.innerHTML = comment.name;
-              }
-            } )
-        })
-      });
+        steamComment$.subscribe(
+          () => {
+            get(`comments?postId=${post.id}`)
+              .then(response => {
+                const arr: any = response;
+                commentList.innerHTML = '';
+                commentList.classList.remove('d-none');
+                for (let comment of arr) {
+                  const commentItem = commentList.appendChild(document.createElement('li'));
+                  commentItem.className = 'list-item';
+                  commentItem.innerHTML = comment.name;
+                }
+              })
+          },
+          (error: string) => console.error(error)
+        )
+      },
+      (error: string) => console.error(error)
+    )
   },
   (error: string) => console.error(error)
 );
@@ -177,7 +144,7 @@ function getCountComments(id: number) {
 function get(url: string) {
   return new Promise((resolve, reject) => {
     let request = new XMLHttpRequest();
-    request.open('GET', `${baseUrl+url}`);
+    request.open('GET', `${baseUrl + url}`);
     request.onload = () => {
       if (request.status === 200) {
         showToast('successful response');
@@ -192,4 +159,3 @@ function get(url: string) {
     request.send();
   });
 }
-
